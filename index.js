@@ -89,10 +89,16 @@ async function main(currentAppointmentDate) {
 
       console.log(bestAvailableDate, bestAvailableTime)
 
+      // GET Embassy information - name, facility ID
+      const embassy = listOfEmbassies.find((embassy) => embassy.name === bestAvailableEmbassy);
+
+      // GET Facility ID
+      const facilityId = embassy.id;
+
       // Book New Appointment
       console.log('Attempt to book new appointment!')
-      bookAppointment(sessionHeaders, bestAvailableDate, bestAvailableTime)
-        .then(d => console.log(`New appointent booked! Date and time: ${bestAvailableDate} (${bestAvailableTime})`))
+      bookAppointment(sessionHeaders, bestAvailableDate, bestAvailableTime, facilityId)
+        .then(d => console.log(`New appointent booked! Date and time: ${bestAvailableDate} (${bestAvailableTime}). Embassy: ${bestAvailableEmbassy}.`))
 
     } else {
       console.log('Unfortunately, no available dates found!');
@@ -236,7 +242,7 @@ function findAvailableTime(headers, date, embassyId) {
     });
 }
 
-async function bookAppointment(sessionHeaders, date, time) {
+async function bookAppointment(sessionHeaders, date, time, facilityId) {
 
   const url = `${BASE_URL}/schedule/${SCHEDULE_ID}/appointment`;
 
@@ -247,7 +253,7 @@ async function bookAppointment(sessionHeaders, date, time) {
     'authenticity_token': headers['X-CSRF-Token'],
     'confirmed_limit_message': '1',
     'use_consulate_appointment_capacity': 'true',
-    'appointments[consulate_appointment][facility_id]': FACILITY_ID,
+    'appointments[consulate_appointment][facility_id]': facilityId,
     'appointments[consulate_appointment][date]': date,
     'appointments[consulate_appointment][time]': time,
     'appointments[asc_appointment][facility_id]': '',
